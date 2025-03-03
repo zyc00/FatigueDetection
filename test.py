@@ -1,5 +1,5 @@
 import cv2
-from src.fat_det import fatigue_detection
+from fatigue.fat_det import fatigue_detection
 from glob import glob
 
 pos_img_files = glob("positive_images/*.jpg")
