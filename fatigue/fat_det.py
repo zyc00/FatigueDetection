@@ -38,37 +38,32 @@ def check_fatigue(landmark: list[tuple[int, int]], image: np.ndarray, visualize=
     right_eye = np.array(landmark[42:48])
     mouse = np.array(landmark[48:68])
 
-    left_eye_hull = cv2.convexHull(left_eye)
-    right_eye_hull = cv2.convexHull(right_eye)
-    mouse_hull = cv2.convexHull(mouse)
+    left_eye_width = left_eye[3][0] - left_eye[0][0]
+    right_eye_width = right_eye[3][0] - right_eye[0][0]
+    left_eye_height = left_eye[5][1] - left_eye[1][1]
+    right_eye_height = right_eye[5][1] - right_eye[1][1]
 
-    cv2.drawContours(image, [left_eye_hull], -1, (0, 255, 0), 1)
-    cv2.drawContours(image, [right_eye_hull], -1, (0, 255, 0), 1)
-    cv2.drawContours(image, [mouse_hull], -1, (0, 255, 0), 1)
+    left_eye_aspect_ratio = left_eye_height / left_eye_width
+    right_eye_aspect_ratio = right_eye_height / right_eye_width
+    eye_aspect_ratio = (left_eye_aspect_ratio + right_eye_aspect_ratio) / 2
 
-    left_eye_hull_area = cv2.contourArea(left_eye_hull)
-    right_eye_hull_area = cv2.contourArea(right_eye_hull)
-    mouse_hull_area = cv2.contourArea(mouse_hull)
-
-    eye_aspect_ratio = (left_eye_hull_area + right_eye_hull_area) / mouse_hull_area
-
-    if visualize:
-        plt.imshow(image[..., ::-1])
-        plt.savefig("fatigue.jpg")
-
-    return eye_aspect_ratio
+    mouse_width = mouse[6][0] - mouse[0][0]
+    mouse_height = mouse[9][1] - mouse[3][1]
+    mouse_aspect_ratio = mouse_height / mouse_width
+    return (mouse_aspect_ratio > 0.8) or (eye_aspect_ratio < 0.2)
 
 
 def fatigue_detection(images: list[np.ndarray], visualize=False):
-    threshold = 0.3
-    fatigue_threshold = 0.5
-    landmarks = [detect_landmarks(img, visualize) for img in images]
-    fatigue = [
-        check_fatigue(landmark, img, visualize)
-        for landmark, img in zip(landmarks, images)
-    ]
-    is_fatigue = [1 if f < threshold else 0 for f in fatigue]
-    fatigue_score = sum(is_fatigue) / len(is_fatigue)
-    if fatigue_score > fatigue_threshold:
-        return True
-    return False
+    try:
+        fatigue_threshold = 0.5
+        landmarks = [detect_landmarks(img, visualize) for img in images]
+        fatigue = [
+            check_fatigue(landmark, img, visualize)
+            for landmark, img in zip(landmarks, images)
+        ]
+        fatigue_score = sum(fatigue) / len(fatigue)
+        if fatigue_score > fatigue_threshold:
+            return True
+        return False
+    except:
+        return False
