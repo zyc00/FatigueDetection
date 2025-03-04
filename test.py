@@ -13,7 +13,7 @@ import numpy as np
 from fatigue.fat_det import fatigue_detection
 import cv2
 
-images = np.load("close_eye.npy")
+images = np.load("open_mouth.npy")
 images = [image for image in images]
 # for image in images:
 #     cv2.imshow("image", image)
