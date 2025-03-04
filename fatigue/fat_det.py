@@ -54,16 +54,13 @@ def check_fatigue(landmark: list[tuple[int, int]], image: np.ndarray, visualize=
 
 
 def fatigue_detection(images: list[np.ndarray], visualize=False):
-    try:
-        fatigue_threshold = 0.5
-        landmarks = [detect_landmarks(img, visualize) for img in images]
-        fatigue = [
-            check_fatigue(landmark, img, visualize)
-            for landmark, img in zip(landmarks, images)
-        ]
-        fatigue_score = sum(fatigue) / len(fatigue)
-        if fatigue_score > fatigue_threshold:
-            return True
-        return False
-    except:
-        return False
+    fatigue_threshold = 0.5
+    landmarks = [detect_landmarks(img, visualize) for img in images]
+    fatigue = [
+        check_fatigue(landmark, img, visualize)
+        for landmark, img in zip(landmarks, images)
+    ]
+    fatigue_score = sum(fatigue) / len(fatigue)
+    if fatigue_score > fatigue_threshold:
+        return True
+    return False
