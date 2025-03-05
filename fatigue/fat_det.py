@@ -56,7 +56,8 @@ def check_fatigue(landmark: list[tuple[int, int]], image: np.ndarray, visualize=
     left_eye_area = cv2.contourArea(left_eye)
     right_eye_area = cv2.contourArea(right_eye)
     eye_area = (left_eye_area + right_eye_area) / 2
-    return (mouse_aspect_ratio > 0.7), (eye_area < 135)
+    mouth_area = cv2.contourArea(mouse)
+    return (mouth_area > 2000), (eye_area < 135)
 
 
 def fatigue_detection(images: list[np.ndarray], visualize=False):
