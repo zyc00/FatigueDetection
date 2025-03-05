@@ -15,7 +15,9 @@ def detect_landmarks(image: np.ndarray, visualize=False):
     mouse_indices = [49, 51, 52, 53, 55, 57, 58, 59]
 
     rect = detector(image, 0)[0]
-    rect_dlib = dlib.rectangle(rect.left(), rect.top(), rect.right(), rect.bottom())
+    image = image[rect.top() : rect.bottom(), rect.left() : rect.right()]
+    # rect_dlib = dlib.rectangle(rect.left(), rect.top(), rect.right(), rect.bottom())
+    rect_dlib = dlib.rectangle(0, 0, image.shape[1], image.shape[0])
 
     points = []
     [points.append((p.x, p.y)) for p in predictor(image, rect_dlib).parts()]
@@ -50,7 +52,11 @@ def check_fatigue(landmark: list[tuple[int, int]], image: np.ndarray, visualize=
     mouse_width = mouse[6][0] - mouse[0][0]
     mouse_height = mouse[9][1] - mouse[3][1]
     mouse_aspect_ratio = mouse_height / mouse_width
-    return (mouse_aspect_ratio > 0.8), (eye_aspect_ratio < 0.2)
+
+    left_eye_area = cv2.contourArea(left_eye)
+    right_eye_area = cv2.contourArea(right_eye)
+    eye_area = (left_eye_area + right_eye_area) / 2
+    return (mouse_aspect_ratio > 0.7), (eye_area < 135)
 
 
 def fatigue_detection(images: list[np.ndarray], visualize=False):
