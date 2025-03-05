@@ -61,18 +61,24 @@ def check_fatigue(landmark: list[tuple[int, int]], image: np.ndarray, visualize=
 
 
 def fatigue_detection(images: list[np.ndarray], visualize=False):
-    fatigue_threshold = 0.5
-    landmarks = [detect_landmarks(img, visualize) for img in images]
-    eye_fatigue = [
-        check_fatigue(landmark, img, visualize)[0]
-        for landmark, img in zip(landmarks, images)
-    ]
-    mouth_fatigue = [
-        check_fatigue(landmark, img, visualize)[1]
-        for landmark, img in zip(landmarks, images)
-    ]
-    fatigue_score_eye = sum(eye_fatigue) / len(eye_fatigue)
-    fatigue_score_mouth = sum(mouth_fatigue) / len(mouth_fatigue)
-    if fatigue_score_eye > fatigue_threshold or fatigue_score_mouth > fatigue_threshold:
-        return True
-    return False
+    try:
+        fatigue_threshold = 0.5
+        landmarks = [detect_landmarks(img, visualize) for img in images]
+        eye_fatigue = [
+            check_fatigue(landmark, img, visualize)[0]
+            for landmark, img in zip(landmarks, images)
+        ]
+        mouth_fatigue = [
+            check_fatigue(landmark, img, visualize)[1]
+            for landmark, img in zip(landmarks, images)
+        ]
+        fatigue_score_eye = sum(eye_fatigue) / len(eye_fatigue)
+        fatigue_score_mouth = sum(mouth_fatigue) / len(mouth_fatigue)
+        if (
+            fatigue_score_eye > fatigue_threshold
+            or fatigue_score_mouth > fatigue_threshold
+        ):
+            return True
+        return False
+    except:
+        return False
